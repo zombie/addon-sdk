@@ -853,18 +853,14 @@ exports['test button after destroy'] = function(assert) {
   loader.unload();
 };
 
-// If the module doesn't support the app we're being run in, require() will
-// throw.  In that case, remove all tests above from exports, and add one dummy
-// test that passes.
-try {
-  require('sdk/ui/button/action');
-}
-catch (err) {
-  if (!/^Unsupported Application/.test(err.message))
-    throw err;
+// temp fix for Bug 959142 - Jetpack permanent orange on Holly..
+// we can't use the require() test as Holly is also on version 29
+// if we can't detect Australis code, remove all tests from exports
+const isAustralis = !!getMostRecentBrowserWindow().CustomizableUI;
 
+if (!isAustralis) {
   module.exports = {
-    'test Unsupported Application': assert => assert.pass(err.message)
+    'test Unsupported Application': assert => assert.pass("No tests on Holly")
   }
 }
 

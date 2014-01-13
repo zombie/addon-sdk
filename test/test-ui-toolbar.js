@@ -9,7 +9,6 @@ module.metadata = {
   }
 };
 
-const { Toolbar } = require("sdk/ui/toolbar");
 const { Loader } = require("sdk/test/loader");
 const { identify } = require("sdk/ui/id");
 const { getMostRecentBrowserWindow, open } = require("sdk/window/utils");
@@ -17,8 +16,17 @@ const { ready, close } = require("sdk/window/helpers");
 const { defer } = require("sdk/core/promise");
 const { send } = require("sdk/event/utils");
 const { object } = require("sdk/util/sequence");
-const { OutputPort } = require("sdk/output/system");
-const output = new OutputPort({ id: "toolbar-change" });
+
+// temp fix for Bug 959142 - Jetpack permanent orange on Holly.. 
+// see bottom of file for more details..
+const isAustralis = !!getMostRecentBrowserWindow().CustomizableUI;
+
+if (isAustralis) {
+  // const is function/global scoped, even if it's used in a block
+  // i know it's hacky, it looks wrong, but it's an easy temp fix..
+  const { OutputPort } = require("sdk/output/system");
+  const output = new OutputPort({ id: "toolbar-change" });
+}
 
 const wait = (toolbar, event) => {
   let { promise, resolve } = defer();
@@ -43,6 +51,7 @@ const readTitle = ({id}, window=getMostRecentBrowserWindow()) =>
   window.document.getElementById(id).getAttribute("toolbarname");
 
 exports["test toolbar API"] = function*(assert) {
+  const { Toolbar } = require("sdk/ui/toolbar");
   assert.throws(() => new Toolbar(),
                 /The `option.title`/,
                 "toolbar requires title");
@@ -113,6 +122,7 @@ exports["test toolbar API"] = function*(assert) {
 };
 
 exports["test show / hide toolbar"] = function*(assert) {
+  const { Toolbar } = require("sdk/ui/toolbar");
   const t1 = new Toolbar({ title: "foo" });
 
   yield wait(t1, "attach");
@@ -141,6 +151,7 @@ exports["test show / hide toolbar"] = function*(assert) {
 };
 
 exports["test multiple windows & toolbars"] = function*(assert) {
+  const { Toolbar } = require("sdk/ui/toolbar");
   const w1 = getMostRecentBrowserWindow();
   const t1 = new Toolbar({ title: "multi window" });
 
@@ -224,6 +235,7 @@ exports["test multiple windows & toolbars"] = function*(assert) {
 };
 
 exports["test toolbar persistence"] = function*(assert) {
+  const { Toolbar } = require("sdk/ui/toolbar");
   const t1 = new Toolbar({ title: "per sist ence" });
 
   yield wait(t1, "attach");
@@ -294,6 +306,7 @@ exports["test toolbar unload"] = function*(assert) {
 };
 
 exports["test toolbar close button"] = function*(assert) {
+  const { Toolbar } = require("sdk/ui/toolbar");
   const t1 = new Toolbar({ title: "close with button" });
 
   yield wait(t1, "attach");
@@ -318,6 +331,7 @@ exports["test toolbar close button"] = function*(assert) {
 };
 
 exports["test title change"] = function*(assert) {
+  const { Toolbar } = require("sdk/ui/toolbar");
   const w1 = getMostRecentBrowserWindow();
   const w2 = open();
 
@@ -357,4 +371,15 @@ exports["test title change"] = function*(assert) {
   yield close(w2);
 };
 
-require("sdk/test").run(exports);
+// temp fix for Bug 959142 - Jetpack permanent orange on Holly..
+// we can't use the require() test as Holly is also on version 29
+// if we can't detect Australis code, remove all tests from exports
+//const isAustralis = !!getMostRecentBrowserWindow().CustomizableUI;
+
+if (!isAustralis) {
+  module.exports = {
+    'test Unsupported Application': assert => assert.pass("No tests on Holly")
+  }
+}
+
+require('sdk/test').run(exports);
