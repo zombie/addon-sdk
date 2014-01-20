@@ -9,8 +9,6 @@ module.metadata = {
   }
 };
 
-const { Frame } = require("sdk/ui/frame");
-const { Toolbar } = require("sdk/ui/toolbar");
 const { Loader } = require("sdk/test/loader");
 const { identify } = require("sdk/ui/id");
 const { setTimeout } = require("sdk/timers");
@@ -19,8 +17,6 @@ const { ready, loaded, close } = require("sdk/window/helpers");
 const { defer } = require("sdk/core/promise");
 const { send } = require("sdk/event/utils");
 const { object } = require("sdk/util/sequence");
-const { OutputPort } = require("sdk/output/system");
-const output = new OutputPort({ id: "toolbar-change" });
 
 const wait = (toolbar, event) => {
   let { promise, resolve } = defer();
@@ -37,6 +33,7 @@ const isAttached = ({id}, window=getMostRecentBrowserWindow()) =>
   !!window.document.getElementById(id);
 
 exports["test frame API"] = function*(assert) {
+  const { Frame } = require("sdk/ui/frame");
   const url = "data:text/html,frame-api";
   assert.throws(() => new Frame(),
                 /The `options.url`/,
@@ -88,6 +85,8 @@ exports["test frame API"] = function*(assert) {
 
 
 exports["test frame in toolbar"] = function*(assert) {
+  const { Frame } = require("sdk/ui/frame");
+  const { Toolbar } = require("sdk/ui/toolbar");
   const assertEvent = (event, type) => {
     assert.ok(event, "`" + type + "` event was dispatched");
     assert.equal(event.type, type, "event.type is: " + type);
@@ -139,6 +138,8 @@ exports["test frame in toolbar"] = function*(assert) {
 
 
 exports["test host to content messaging"] = function*(assert) {
+  const { Frame } = require("sdk/ui/frame");
+  const { Toolbar } = require("sdk/ui/toolbar");
   const url = "data:text/html,<script>new " + function() {
     window.addEventListener("message", (event) => {
       if (event.data === "ping!")
@@ -160,6 +161,8 @@ exports["test host to content messaging"] = function*(assert) {
 
 
 exports["test content to host messaging"] = function*(assert) {
+  const { Frame } = require("sdk/ui/frame");
+  const { Toolbar } = require("sdk/ui/toolbar");
   const url = "data:text/html,<script>new " + function() {
     window.addEventListener("message", (event) => {
       if (event.data === "pong!")
@@ -186,6 +189,8 @@ exports["test content to host messaging"] = function*(assert) {
 
 
 exports["test direct messaging"] = function*(assert) {
+  const { Frame } = require("sdk/ui/frame");
+  const { Toolbar } = require("sdk/ui/toolbar");
   const url = "data:text/html,<script>new " + function() {
     var n = 0;
     window.addEventListener("message", (event) => {
@@ -235,4 +240,15 @@ exports["test direct messaging"] = function*(assert) {
   yield wait(t1, "detach");
 };
 
-require("sdk/test").run(exports);
+// temp fix for Bug 959142 - Jetpack permanent orange on Holly..
+// we can't use the require() test as Holly is also on version 29
+// if we can't detect Australis code, remove all tests from exports
+const isAustralis = !!getMostRecentBrowserWindow().CustomizableUI;
+
+if (!isAustralis) {
+  module.exports = {
+    'test Unsupported Application': assert => assert.pass("No tests on Holly")
+  }
+}
+
+require('sdk/test').run(exports);
