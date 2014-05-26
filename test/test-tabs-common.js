@@ -137,7 +137,7 @@ exports.testTabClose_alt = function(assert, done) {
     }
   });
 };
-/*
+
 exports.testAttachOnOpen_alt = function (assert, done) {
   // Take care that attach has to be called on tab ready and not on tab open.
   tabs.open({
@@ -155,8 +155,7 @@ exports.testAttachOnOpen_alt = function (assert, done) {
     }
   });
 };
-*/
-/*
+
 exports.testAttachOnMultipleDocuments_alt = function (assert, done) {
   // Example of attach that process multiple tab documents
   let firstLocation = "data:text/html;charset=utf-8,foobar";
@@ -232,8 +231,7 @@ exports.testAttachOnMultipleDocuments_alt = function (assert, done) {
     done();
   }
 };
-*/
-/*
+
 exports.testAttachWrappers_alt = function (assert, done) {
   // Check that content script has access to wrapped values by default
 
@@ -260,8 +258,7 @@ exports.testAttachWrappers_alt = function (assert, done) {
     }
   });
 };
-*/
-/*
+
 // TEST: activeWindow getter and activeTab getter on tab 'activate' event
 exports.testActiveWindowActiveTabOnActivate_alt = function(assert, done) {
 
@@ -298,7 +295,7 @@ exports.testActiveWindowActiveTabOnActivate_alt = function(assert, done) {
     onOpen: function(tab) newTabs.push(tab)
   });
 };
-*/
+
 // TEST: tab properties
 exports.testTabContentTypeAndReload = function(assert, done) {
 
@@ -428,7 +425,7 @@ exports.testTabReload = function(assert, done) {
     }
   });
 };
-/*
+
 exports.testOnPageShowEvent = function (assert, done) {
   let events = [];
   let firstUrl = 'data:text/html;charset=utf-8,First';
@@ -474,8 +471,7 @@ exports.testOnPageShowEvent = function (assert, done) {
     url: firstUrl
   });
 };
-*/
-/*
+
 exports.testOnPageShowEventDeclarative = function (assert, done) {
   let events = [];
   let firstUrl = 'data:text/html;charset=utf-8,First';
@@ -521,5 +517,5 @@ exports.testOnPageShowEventDeclarative = function (assert, done) {
     onReady: onReady
   });
 };
-*/
+
 require('sdk/test').run(exports);
